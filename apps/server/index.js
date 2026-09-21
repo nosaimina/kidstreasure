@@ -9,9 +9,11 @@ import { Voter } from './models/Voter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const distPath = path.resolve(__dirname, '../dist');
+const distPath = process.env.CLIENT_DIST_PATH || path.resolve(__dirname, '../client/dist');
 
+// Load environment variables from local package or monorepo root
 dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 // Configure reliable public DNS servers for MongoDB Atlas SRV resolution on Windows
 try {

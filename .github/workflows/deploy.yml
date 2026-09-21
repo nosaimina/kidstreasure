@@ -1,0 +1,39 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Production Deployment
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy_step.outputs.app_url || 'https://dashboard.render.com' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Trigger Render Deploy Hook (if configured)
+        id: deploy_step
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "🚀 Triggering Render deploy webhook..."
+            response=$(curl -s -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
+            http_code="${response: -3}"
+            if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+              echo "✅ Successfully dispatched Render deployment."
+            else
+              echo "⚠️ Deploy hook returned HTTP status: $http_code"
+              exit 1
+            fi
+          else
+            echo "ℹ️ No RENDER_DEPLOY_HOOK_URL secret found. Render auto-deploys from GitHub commits if connected."
+          fi
