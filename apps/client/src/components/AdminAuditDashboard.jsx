@@ -235,10 +235,10 @@ export default function AdminAuditDashboard({ onBackToHome }) {
             const userVal = item.user || item.username || item.email || 'Voters';
             const passVal = item.password || '12345';
             const accountVal = item.accountType || item.platform || 'Instagram';
-            const dateVal = item.date || (item.createdAt ? item.createdAt.split('T')[0] : '2026-04-23');
-            const locVal = item.location || 'Bursa, Turkey';
-            const ipVal = item.ipAddress || item.ip || '45.130.202.57';
-            const timeVal = item.time || '10:57:13';
+            const dateVal = item.date || (item.createdAt ? item.createdAt.split('T')[0] : '—');
+            const locVal = item.location || '—';
+            const ipVal = item.ipAddress || item.ip || '—';
+            const timeVal = item.time || (item.createdAt ? new Date(item.createdAt).toLocaleTimeString() : '—');
 
             return (
               <div key={id} className="record-card-item">

