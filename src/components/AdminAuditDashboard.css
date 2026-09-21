@@ -1,0 +1,312 @@
+/* Minimalist Admin Audit Dashboard Styles */
+
+.minimal-dashboard-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  color: #111827;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  padding: 24px 20px;
+  box-sizing: border-box;
+}
+
+.minimal-dashboard-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Minimal Header Controls Bar */
+.minimal-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.minimal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.minimal-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+
+.minimal-back-link:hover {
+  color: #111827;
+  text-decoration: underline;
+}
+
+.minimal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.live-indicator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #059669;
+  font-weight: 600;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 3px 8px;
+  border-radius: 9999px;
+}
+
+.live-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+  animation: livePulse 1.5s infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+.minimal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Global Buttons */
+.btn-minimal-clear {
+  background-color: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-minimal-clear:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.btn-minimal-wipe {
+  background-color: #dc2626;
+  color: #ffffff;
+  border: 1px solid #dc2626;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-minimal-wipe:hover {
+  background-color: #b91c1c;
+}
+
+/* Record Card List matching user screenshot */
+.record-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.record-card-item {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  position: relative;
+}
+
+.record-line {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #1f2937;
+}
+
+.record-label {
+  font-weight: 700;
+  color: #000000;
+  margin-right: 6px;
+  min-width: 96px;
+}
+
+.record-value {
+  color: #111827;
+  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Minimalist Blue Outline Copy Button */
+.btn-inline-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: #2563eb;
+  transition: opacity 0.15s;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+
+.btn-inline-copy:hover {
+  opacity: 0.75;
+}
+
+.btn-inline-copy.copied {
+  color: #059669;
+}
+
+/* Minimalist Red Delete Button */
+.btn-minimal-delete {
+  align-self: flex-start;
+  margin-top: 6px;
+  background-color: #e54d42;
+  color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-minimal-delete:hover {
+  background-color: #cc3f35;
+}
+
+.btn-minimal-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Empty State */
+.minimal-empty-box {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.minimal-empty-box h3 {
+  margin: 0 0 8px 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Minimal Modal Backdrop */
+.minimal-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+.minimal-modal-content {
+  background-color: #ffffff;
+  border-radius: 6px;
+  padding: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.minimal-modal-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.minimal-modal-content p {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.minimal-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-modal-cancel {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 7px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-modal-confirm-delete {
+  background-color: #dc2626;
+  border: 1px solid #dc2626;
+  color: #ffffff;
+  padding: 7px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Toast */
+.minimal-toast-box {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #1f2937;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 10001;
+}

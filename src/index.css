@@ -1,0 +1,294 @@
+/* CSS Design System - Fabulous Kiddies Talent Contest */
+:root {
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-script: 'Caveat', cursive;
+
+  /* Color Palette matching reference media */
+  --primary-purple: #7928ca;
+  --primary-purple-gradient: linear-gradient(90deg, #4f46e5 0%, #7c3aed 48%, #c026d3 100%);
+  --accent-blue: #0288d1;
+  --accent-blue-gradient: linear-gradient(180deg, #0288d1 0%, #00b4d8 100%);
+  --accent-pink: #d81b60;
+  --accent-pink-gradient: linear-gradient(180deg, #c2185b 0%, #e91e63 100%);
+  --accent-gold: #f59e0b;
+  --accent-gold-gradient: linear-gradient(180deg, #f59e0b 0%, #fbbf24 100%);
+  
+  --bg-white: #ffffff;
+  --bg-subtle: #f8fafc;
+  --bg-card: #ffffff;
+  
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --border-light: #e2e8f0;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-white);
+  color: var(--text-dark);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Top Purple Accent Border */
+.top-accent-bar {
+  height: 5px;
+  width: 100%;
+  background: var(--primary-purple-gradient);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+/* Container */
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 16px;
+  width: 100%;
+}
+
+/* Typography Helpers */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.script-text {
+  font-family: var(--font-script);
+}
+
+/* Slanted Banner Elements */
+.slanted-ribbon-purple {
+  background: var(--primary-purple-gradient);
+  clip-path: polygon(30px 0%, 100% 0%, calc(100% - 30px) 100%, 0% 100%);
+  color: #ffffff;
+  padding: 14px 44px;
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 20px rgba(124, 58, 237, 0.25);
+  transition: transform 0.25s ease, filter 0.25s ease;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.slanted-ribbon-purple:hover {
+  transform: scale(1.02);
+  filter: brightness(1.05);
+}
+
+/* Slanted Category Vertical Accent Ribbons */
+.vertical-ribbon {
+  position: absolute;
+  top: 0;
+  width: 58px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 1.25rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 1;
+  transition: width 0.3s ease, filter 0.3s ease;
+  user-select: none;
+}
+
+.vertical-ribbon.left {
+  left: 0;
+  clip-path: polygon(0 60px, 100% 0, 100% 100%, 0 100%);
+}
+
+.vertical-ribbon.right {
+  right: 0;
+  clip-path: polygon(0 0, 100% 60px, 100% 100%, 0 100%);
+}
+
+.vertical-ribbon-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+}
+
+/* Custom Ribbon Color Variations */
+.ribbon-blue {
+  background: var(--accent-blue-gradient);
+}
+
+.ribbon-pink {
+  background: var(--accent-pink-gradient);
+}
+
+.ribbon-gold {
+  background: var(--accent-gold-gradient);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: var(--primary-purple-gradient);
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  padding: 10px 22px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+}
+
+.btn-outline {
+  background: #ffffff;
+  color: var(--text-dark);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1.5px solid var(--border-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.btn-outline:hover {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+  background: #faf5ff;
+}
+
+/* Floating Animations */
+@keyframes softFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.soft-float {
+  animation: softFloat 4s ease-in-out infinite;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 580px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+/* Responsive adjustments across mobile & tablet */
+@media (max-width: 900px) {
+  .slanted-ribbon-purple {
+    font-size: 1.35rem;
+    padding: 10px 28px;
+    clip-path: polygon(18px 0%, 100% 0%, calc(100% - 18px) 100%, 0% 100%);
+  }
+  
+  .vertical-ribbon {
+    width: 44px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .slanted-ribbon-purple {
+    font-size: 1.05rem;
+    padding: 8px 20px;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+    letter-spacing: 0.04em;
+  }
+  
+  .vertical-ribbon {
+    width: 32px;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  .modal-overlay {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .slanted-ribbon-purple {
+    font-size: 0.92rem;
+    padding: 6px 14px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    letter-spacing: 0.02em;
+  }
+}
